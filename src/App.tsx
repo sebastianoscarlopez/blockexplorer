@@ -1,5 +1,8 @@
 import { Alchemy, Network } from 'alchemy-sdk';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Canvas } from "@react-three/fiber";
+import Block from "./components/block";
+import { Html, Stats } from "@react-three/drei";
 
 import './App.css';
 
@@ -20,7 +23,7 @@ const settings = {
 const alchemy = new Alchemy(settings);
 
 function App() {
-  const [blockNumber, setBlockNumber] = useState();
+  const [blockNumber, setBlockNumber] = useState < number > ();
 
   useEffect(() => {
     async function getBlockNumber() {
@@ -30,7 +33,20 @@ function App() {
     getBlockNumber();
   });
 
-  return <div className="App">Block Number: {blockNumber}</div>;
+  return (
+    <Canvas>
+      <ambientLight color={"red"} />
+      <pointLight color={"green"} position={[10, 10, 10]} />
+      <Block position={[-1.2, 1, 0]} />
+      <Block position={[1.2, 0, 0]} />
+      <Html>
+        <div className="App">
+          Block Number: {blockNumber}
+          {/* <CanvasContainer /> */}
+        </div>
+      </Html>
+    </Canvas>
+  );
 }
 
 export default App;
