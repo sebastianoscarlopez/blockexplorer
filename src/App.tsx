@@ -42,12 +42,17 @@ function App() {
             />
           </group>
         )}
-        {/* <Html>
-          <div className="App">
-            Block Number: {blockNumber}
-          </div>
-        </Html> */}
-        <OrbitControls rotation={[-0.5, 0, 0]} />
+        <OrbitControls
+          target={[0, 1.5, 0]}
+          enableDamping={false}
+          rotateSpeed={0.1}
+          zoomSpeed={0.1}
+          panSpeed={0.1}
+          keyPanSpeed={0.1}
+          autoRotateSpeed={0.1}
+          maxDistance={7}
+          minDistance={4.5}
+        />
         <Stats />
       </Canvas>
     </div>

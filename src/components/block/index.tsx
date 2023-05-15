@@ -1,16 +1,11 @@
-import React, {
-  FunctionComponent,
-  PropsWithChildren,
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 import { MeshProps } from "@react-three/fiber";
-import { Text, RoundedBox } from "@react-three/drei";
+import { Text } from "@react-three/drei";
 
 import useBlock from "../../hooks/useBlock";
-import { FaceTransaction } from "./FaceTransaction";
-
-type Position = [x: number, y: number, z: number];
+import { BlockBox } from "./BlockBox";
+import { Position } from "../../definitions/Position.d";
+import { Transaction } from "./Transaction";
 
 interface BlockProps extends MeshProps {
   blockNumber: number;
@@ -26,15 +21,6 @@ function Block({ blockNumber, ...meshProps }: BlockProps) {
       setBlockColor(`#${blockData.hash.substring(2, 8)}`);
     }
   }, [blockData?.hash]);
-
-  const BlockBox: FunctionComponent<
-    PropsWithChildren<{ scale?: number | Position; color: string }>
-  > = ({ children, scale, color }) => (
-    <RoundedBox scale={scale} args={[1, 1, 1]} radius={0.05} creaseAngle={0.4}>
-      <meshPhysicalMaterial color={color} metalness={0.7} roughness={0.7} />
-      {children}
-    </RoundedBox>
-  );
 
   const totalTransactions = blockData?.transactions.length || 0;
   const rows = Math.ceil(Math.sqrt(totalTransactions));
@@ -55,11 +41,11 @@ function Block({ blockNumber, ...meshProps }: BlockProps) {
     return position;
   };
 
-  const yScale = rows / cols;
+  const ySize = rows / cols;
 
   return (
     <mesh {...meshProps}>
-      <BlockBox scale={[1, yScale, 1]} color={blockColor}>
+      <BlockBox scale={[1, ySize, 1]} color={blockColor}>
         <Text
           position={[0, 0.501, -0.125]}
           rotation={[Math.PI / -2, 0, 0]}
@@ -89,14 +75,11 @@ function Block({ blockNumber, ...meshProps }: BlockProps) {
       </BlockBox>
       {blockData &&
         blockData.transactions.map(({ hash }, index) => (
-          <group position={getPosition(index)}>
-            <BlockBox
-              scale={1 / rows - 0.01}
-              color={`#${hash.substring(2, 8)}`}
-            >
-              <FaceTransaction hash={hash} />
-            </BlockBox>
-          </group>
+          <Transaction
+            position={getPosition(index)}
+            scale={1 / rows - 0.01}
+            hash={hash}
+          />
         ))}
     </mesh>
   );
