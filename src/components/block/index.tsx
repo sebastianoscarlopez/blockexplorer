@@ -1,36 +1,68 @@
-import React, { useRef, useState } from "react";
-import { MeshProps, useFrame } from "@react-three/fiber";
+import React, {
+  FunctionComponent,
+  PropsWithChildren,
+  useEffect,
+  useState,
+} from "react";
+import { MeshProps } from "@react-three/fiber";
 import { Text, RoundedBox } from "@react-three/drei";
 
-import { MeshStandardMaterial, Mesh } from "three";
+import useBlock from "../../hooks/useBlock";
+import { FaceTransaction } from "./FaceTransaction";
+
+type Position = [x: number, y: number, z: number];
 
 interface BlockProps extends MeshProps {
   blockNumber: number;
-  color: string;
 }
 
-function Block({ blockNumber, color, ...meshProps }: BlockProps) {
-  const ref = useRef<Mesh>(null!);
+function Block({ blockNumber, ...meshProps }: BlockProps) {
+  const { blockData } = useBlock(blockNumber);
 
-  const [hovered, hover] = useState(false);
-  const [clicked, click] = useState(false);
+  const [blockColor, setBlockColor] = useState("gray");
 
-  // useFrame((state, delta) => (ref.current.rotation.x += delta * 0.3));
+  useEffect(() => {
+    if (blockData?.hash) {
+      setBlockColor(`#${blockData.hash.substring(2, 8)}`);
+    }
+  }, [blockData?.hash]);
 
-  const blackMaterial = new MeshStandardMaterial({ color: "black" });
+  const BlockBox: FunctionComponent<
+    PropsWithChildren<{ scale?: number | Position; color: string }>
+  > = ({ children, scale, color }) => (
+    <RoundedBox scale={scale} args={[1, 1, 1]} radius={0.05} creaseAngle={0.4}>
+      <meshPhysicalMaterial color={color} metalness={0.7} roughness={0.7} />
+      {children}
+    </RoundedBox>
+  );
+
+  const totalTransactions = blockData?.transactions.length || 0;
+  const rows = Math.ceil(Math.sqrt(totalTransactions));
+  const cols = Math.ceil(totalTransactions / rows);
+  const getRowCol = (index: number) => ({
+    row: Math.floor(index / cols),
+    col: index % cols,
+  });
+  const getPosition = (index: number) => {
+    const { col, row } = getRowCol(index);
+    const dist = 1 / rows;
+
+    const position: Position = [
+      -dist * (cols / 2) + dist / 2 + dist * col,
+      dist * (rows / 2) - dist / 2 - dist * row,
+      0.5,
+    ];
+    return position;
+  };
+
+  const yScale = rows / cols;
 
   return (
-    <mesh
-      ref={ref}
-      onClick={(event) => click(!clicked)}
-      onPointerOver={(event) => hover(true)}
-      onPointerOut={(event) => hover(false)}
-      {...meshProps}
-    >
-      <RoundedBox args={[1, 1, 1]} radius={0.05} creaseAngle={0.4}>
-        <meshPhysicalMaterial color={color} metalness={0.7} roughness={0.7} />
+    <mesh {...meshProps}>
+      <BlockBox scale={[1, yScale, 1]} color={blockColor}>
         <Text
-          position={[0, 0, 0.501]}
+          position={[0, 0.501, -0.125]}
+          rotation={[Math.PI / -2, 0, 0]}
           fontSize={0.15}
           color="cyan"
           anchorX="center"
@@ -40,7 +72,32 @@ function Block({ blockNumber, color, ...meshProps }: BlockProps) {
         >
           {blockNumber}
         </Text>
-      </RoundedBox>
+        {blockData && (
+          <Text
+            position={[0, 0.501, 0.125]}
+            rotation={[Math.PI / -2, 0, 0]}
+            fontSize={0.1}
+            color="cyan"
+            anchorX="center"
+            anchorY="middle"
+            outlineColor={"white"}
+            outlineWidth={0.003}
+          >
+            {blockData.hash.substring(0, 8)}...
+          </Text>
+        )}
+      </BlockBox>
+      {blockData &&
+        blockData.transactions.map(({ hash }, index) => (
+          <group position={getPosition(index)}>
+            <BlockBox
+              scale={1 / rows - 0.01}
+              color={`#${hash.substring(2, 8)}`}
+            >
+              <FaceTransaction hash={hash} />
+            </BlockBox>
+          </group>
+        ))}
     </mesh>
   );
 }
