@@ -4,7 +4,7 @@ import { Text } from "@react-three/drei";
 
 import useBlock from "../../hooks/useBlock";
 import { BlockBox } from "./BlockBox";
-import { Position } from "../../definitions/Position.d";
+import { Coords } from "../../definitions/Coords.d";
 import { Transaction } from "./Transaction";
 
 interface BlockProps extends MeshProps {
@@ -33,7 +33,7 @@ function Block({ blockNumber, ...meshProps }: BlockProps) {
     const { col, row } = getRowCol(index);
     const dist = 1 / rows;
 
-    const position: Position = [
+    const position: Coords = [
       -dist * (cols / 2) + dist / 2 + dist * col,
       dist * (rows / 2) - dist / 2 - dist * row,
       0.5,

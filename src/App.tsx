@@ -1,7 +1,7 @@
 import React from "react";
 import { Canvas } from "@react-three/fiber";
 import Block from "./components/block";
-import { OrbitControls, Stats } from "@react-three/drei";
+import { Html, OrbitControls, Stats } from "@react-three/drei";
 
 import "./App.css";
 import useBlock from "./hooks/useBlock";
@@ -18,15 +18,12 @@ import { degreesToRadians } from "./utils/mathHelpers";
 //   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
 
 function App() {
-  // const { lastBlockNumber } = useBlock(0);
+  const { lastBlockNumber } = useBlock(0);
 
-  const lastBlockNumber = 17264939;
+  // const lastBlockNumber = 17264939;
 
   const gap = 0.1;
 
-  // Green block: #22A83F
-  // Red block: #A82222
-  // Blue block: #429FC8
   return (
     <div className="App">
       <Canvas>
@@ -53,7 +50,36 @@ function App() {
           maxDistance={7}
           minDistance={4.5}
         />
-        <Stats />
+        <Html
+          position={[0, 8, -1]}
+          style={{
+            width: 600,
+            textAlign: "center",
+            left: -300,
+            color: "lightgreen",
+          }}
+        >
+          <h1>Block explorer</h1>
+          <p>
+            Proof of concept. Blockchain in 3D. This was part of week 3 of the
+            Ethereum course at Alchemy University.
+          </p>
+          <p>
+            It displays the last three blocks of Ethereum network and its
+            transactions
+          </p>
+          <a href="https://github.com/sebastianoscarlopez/blockexplorer">
+            <strong
+              style={{
+                color: "white",
+                fontStyle: "italic",
+                borderBottom: "1px solid white",
+              }}
+            >
+              https://github.com/sebastianoscarlopez/blockexplorer
+            </strong>
+          </a>
+        </Html>
       </Canvas>
     </div>
   );

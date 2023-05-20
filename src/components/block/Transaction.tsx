@@ -1,10 +1,10 @@
 import React, { FunctionComponent } from "react";
 import { FaceTransaction } from "./FaceTransaction";
 import { BlockBox } from "./BlockBox";
-import { Position } from "../../definitions/Position.d";
+import { Coords } from "../../definitions/Coords.d";
 
 export const Transaction: FunctionComponent<{
-  position: Position;
+  position: Coords;
   scale: number;
   hash: string;
 }> = ({ position, scale, hash }) => {
